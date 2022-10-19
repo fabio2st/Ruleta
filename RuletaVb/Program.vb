@@ -19,14 +19,16 @@ Module Program
                     FinalReport(numbers)
                 Case "0"
                     Console.WriteLine("Jugada anulada")
-                Case in boardNumbers
-                    Dim number As Byte = Convert.ToByte(value)
-                    ReportNumber(number)
-                    CountNumber(number, numbers)
                 Case Else
-                    Console.WriteLine("Valor incorrecto")
+                    If IsNumber(value, boardNumbers) Then
+                        Dim number As Byte = Convert.ToByte(value)
+                        ReportNumber(number)
+                        CountNumber(number, numbers)
+                    Else
+                        Console.WriteLine("Valor incorrecto")
+                    End If
             End Select
-        Loop While value <> "*"
+        Loop Until value = "*"
     End Sub
     Sub FinalReport(ByVal numbers As UShort())
         For i As Integer = 0 To numbers.Length - 1
