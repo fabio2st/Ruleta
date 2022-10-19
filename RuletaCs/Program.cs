@@ -4,134 +4,116 @@ namespace RuletaCs
 {
     class Program
     {
-       const byte totalNumeros = 37;
-       enum columnas { derecha, central,izquierda };
+       const byte totalNumbers = 36;
+       enum Columns { derecha, central,izquierda };
        static void Main(string[] args)
-        {
-            string numero;
-            string[] numeros = GetNumeros();
+       {
+            string value;
+            string[] boardNumbers = GetBoard();
+            ushort[] numbers = new ushort[36];
             do
             {
-                numero = IngresarNumero();
-                switch (numero)
+                value = InputValue();
+                switch (value)
                 {
                     case "*":
+                        FinalReport(numbers);
                         break;
                     case "0":
                         Console.WriteLine("Jugada anulada");
                         break;
-                    case string value when esNumero(value, numeros):
-                        ReportNumber(value);
+                    case string v when IsNumber(v, boardNumbers):
+                        byte number = Convert.ToByte(v);
+                        ReportNumber(number);
+                        CountNumber(number, numbers);
                         break;
                     default:
                         Console.WriteLine("Valor incorrecto");
                         break;
                 }
-            } while (numero != "*");
+            } while (value != "*");
         }
-
-        private static string IngresarNumero()
+        private static void FinalReport(ushort[] numbers)
         {
-            string numero;
-            Console.Write("Ingrese un número: ");
-            numero = Console.ReadLine();
-            return numero;
+            for (int i = 0; i < numbers.Length; i++)
+            {
+                if (numbers[i] > 0)
+                    Console.WriteLine($"{i+1} -> {numbers[i]}");
+            }
         }
-
-        private static void ReportNumber(string value)
+        private static void CountNumber(byte number, ushort[] numeros)
         {
-            Console.WriteLine(value);
-            var number = Convert.ToByte(value);
-
-            InformarColor(number);
-
-            InformarColumna(number);
-
-            InformarMitad(number);
-
-            InformarParImpar(number);
+            numeros[number-1]++;
         }
-
-        private static void InformarParImpar(byte number)
+        private static string InputValue()
         {
-            if (isPar(number))
+            string value;
+            Console.Write("Ingrese un número o * para salir: ");
+            value = Console.ReadLine();
+            return value;
+        }
+        private static void ReportNumber(byte number)
+        {
+            Console.WriteLine(number);
+            ReportColor(number);
+            ReportColumn(number);
+            ReportHalf(number);
+            ReportEvenOrOdd(number);
+        }
+        private static void ReportEvenOrOdd(byte number)
+        {
+            if (number % 2 == 0)
                 Console.WriteLine("Es Par");
             else
                 Console.WriteLine("Es impar");
         }
-
-        private static void InformarMitad(byte number)
+        private static void ReportHalf(byte number)
         {
-            if (isMenor(number))
+            if (number <= totalNumbers / 2)
                 Console.WriteLine("Es menor");
             else
                 Console.WriteLine("Es mayor");
         }
-
-        private static void InformarColumna(byte number)
+        private static void ReportColumn(byte number)
         {
-            switch (getColumna(number))
-            {
-                case columnas.izquierda:
-                    Console.WriteLine("Columna izquierda");
-                    break;
-                case columnas.central:
-                    Console.WriteLine("Columna central");
-                    break;
-                default:
-                    Console.WriteLine("Columna derecha");
-                    break;
-            }
+            Columns column = getColumn(number);
+            Console.WriteLine($"Columna {column}");
         }
-
-        private static void InformarColor(byte number)
+        private static void ReportColor(byte number)
         {
-            if (isRojo(number))
+            if (IsRed(number))
                 Console.WriteLine("Es rojo");
             else
                 Console.WriteLine("Es negro");
         }
-
-        static columnas getColumna(byte number)
+        static Columns getColumn(byte number)
         {
             if (number % 3 == 0)
-                return columnas.derecha;
-            else if (++number % 3 == 0)
-                return columnas.central;
+                return Columns.derecha;
+            else if ((number+1) % 3 == 0)
+                return Columns.central;
             else
-                return columnas.izquierda;
+                return Columns.izquierda;
         }
-        private static bool isRojo(byte number)
+        private static bool IsRed(byte number)
         {
-            byte[] rojos = { 1, 3, 5, 7, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 30, 32, 34, 36 };
-            foreach (byte rojo in rojos)
-                if (rojo == number)
+            byte[] reds = { 1, 3, 5, 7, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 30, 32, 34, 36 };
+            foreach (byte red in reds)
+                if (red == number)
                     return true;
             return false;
         }
-
-        private static bool isMenor(byte number)
+        private static string[] GetBoard()
         {
-            return number <= totalNumeros / 2;
+            string[] numbers = new string[totalNumbers];
+            for (byte x = 0; x < totalNumbers; x++)
+                numbers[x] = Convert.ToString(x+1);
+            return numbers;
         }
-
-        private static bool isPar(byte number)
+        static bool IsNumber(string value, string[] numbers)
         {
-            return number % 2 == 0;
-        }
-
-        private static string[] GetNumeros()
-        {
-            string[] numeros = new string[totalNumeros];
-            for (byte x = 0; x < totalNumeros; x++)
-                numeros[x] = Convert.ToString(x);
-            return numeros;
-        }
-
-        static bool esNumero(string value, string[] numeros)
-        {
-            foreach (string numero in numeros)
-                if (value == numero)
+            foreach (string number in numbers)
+                if (value == number)
                     return true;
             return false;
         }
